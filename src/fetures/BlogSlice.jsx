@@ -1,0 +1,63 @@
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
+export const fetchBlogs = createAsyncThunk(
+    "bolgs/fetchBlogs", async () => {
+        const response = await fetch("https://jsonplaceholder.typicode.com/posts")
+
+        if(!response.ok){
+            throw new error("unable to fetch blogs")
+        }
+        return await response.json()
+    }
+        
+ 
+)
+
+const initialState = {
+    blogs: [],
+    countBlogs: 0,
+    blogUpdated:0,
+    currentPage: 1,
+    loading: false,
+    error: null
+}
+
+const BlogSlice = createSlice({
+    name: "blogs", 
+    initialState,
+    reducers: 
+    {
+        removeBlog: (state, action)=>{
+            let newBlogs = state.blogs.filter((value)=>value.id != action.payload)
+        
+            state.blogs = newBlogs
+            state.blogUpdated+=1
+        },
+        moveToPage: (state, action)=>{
+            state.currentPage = action.payload
+    }
+  
+
+},
+    extraReducers: (builder)=>{
+        builder
+        .addCase(fetchBlogs.pending, (state)=>{
+            state.loading = true
+            state.error = null
+        })
+        .addCase(fetchBlogs.fulfilled, (state, action)=>{
+            state.blogs = action.payload 
+            state.loading = false
+            state.error = null
+            state.countBlogs = action.payload.length
+        })
+        .addCase(fetchBlogs.rejected, (state, action)=>{
+            state.loading = false
+            state.error = action.error.message
+        })
+    }
+
+})
+
+export const {removeBlog, moveToPage} = BlogSlice.actions
+export default BlogSlice.reducer
