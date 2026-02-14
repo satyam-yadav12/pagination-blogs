@@ -4,7 +4,7 @@ import {removeBlog, moveToPage, fetchBlogs} from "../fetures/BlogSlice"
 import { useDispatch, useSelector } from 'react-redux'
 
 const Blogs = ()=>{
-  const {blogs, countBlogs, blogUpdated, currentPage, loading, error  } = useSelector((state)=>state.blogs)
+  const {blogs, countBlogs,  currentPage, loading, error  } = useSelector((state)=>state.blogs)
   const dispatch = useDispatch()
 
   const [currentBlogs, setCurrentBlogs] = useState([])
@@ -21,17 +21,17 @@ const Blogs = ()=>{
     const skip = (currentPage-1)*limit
     const temp = blogs.slice(skip, skip+limit)
     setCurrentBlogs(temp)}
-  }, [currentPage, loading, blogUpdated])
+  }, [currentPage, loading, blogs])
 
   useEffect(()=>{
    let count = 1
     let pages = []
-    const pageLimit = countBlogs/6
+    const pageLimit = Math.ceil(blogs.length/limit) 
    for(count; count<= pageLimit ; count++){
     pages.push(count)
    }
    setPageNumbers(pages)
-  },[countBlogs])
+  },[blogs])
 
 
     return (

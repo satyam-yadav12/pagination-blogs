@@ -5,7 +5,7 @@ export const fetchBlogs = createAsyncThunk(
         const response = await fetch("https://jsonplaceholder.typicode.com/posts")
 
         if(!response.ok){
-            throw new error("unable to fetch blogs")
+            throw new Error("unable to fetch blogs")
         }
         return await response.json()
     }
@@ -15,8 +15,6 @@ export const fetchBlogs = createAsyncThunk(
 
 const initialState = {
     blogs: [],
-    countBlogs: 0,
-    blogUpdated:0,
     currentPage: 1,
     loading: false,
     error: null
@@ -31,7 +29,7 @@ const BlogSlice = createSlice({
             let newBlogs = state.blogs.filter((value)=>value.id != action.payload)
         
             state.blogs = newBlogs
-            state.blogUpdated+=1
+          
         },
         moveToPage: (state, action)=>{
             state.currentPage = action.payload
@@ -49,7 +47,7 @@ const BlogSlice = createSlice({
             state.blogs = action.payload 
             state.loading = false
             state.error = null
-            state.countBlogs = action.payload.length
+           
         })
         .addCase(fetchBlogs.rejected, (state, action)=>{
             state.loading = false
