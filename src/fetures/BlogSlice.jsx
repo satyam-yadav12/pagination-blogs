@@ -14,6 +14,7 @@ const initialState = {
   currentPage: 1,
   loading: false,
   error: null,
+  limit: 6,
 };
 
 const BlogSlice = createSlice({
@@ -24,6 +25,10 @@ const BlogSlice = createSlice({
       let newBlogs = state.blogs.filter((value) => value.id != action.payload);
 
       state.blogs = newBlogs;
+      const maxPages = Math.ceil(newBlogs.length / state.limit);
+      if (state.currentPage > maxPages) {
+        state.currentPage = maxPages;
+      }
     },
     moveToPage: (state, action) => {
       state.currentPage = action.payload;

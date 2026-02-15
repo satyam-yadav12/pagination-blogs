@@ -4,14 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchBlogs, moveToPage, removeBlog } from "../fetures/BlogSlice";
 
 const Blogs = () => {
-  const { blogs, currentPage, loading, error } = useSelector(
+  const { blogs, currentPage, loading, error, limit } = useSelector(
     (state) => state.blogs,
   );
   const dispatch = useDispatch();
 
   const [currentBlogs, setCurrentBlogs] = useState([]);
   const [pageNumbers, setPageNumbers] = useState([]);
-  const limit = 6;
 
   useEffect(() => {
     dispatch(fetchBlogs());
@@ -23,7 +22,7 @@ const Blogs = () => {
       const temp = blogs.slice(skip, skip + limit);
       setCurrentBlogs(temp);
     }
-  }, [currentPage, loading, blogs]);
+  }, [currentPage, loading, blogs, limit]);
 
   useEffect(() => {
     let count = 1;
@@ -39,7 +38,7 @@ const Blogs = () => {
     <>
       <p className="text-2xl m-5 ml-[5%]">Blogs</p>
       <div className="grid grid-cols-3 gap-3 m-[5%] mt-5">
-        {currentBlogs.length > 1 ? (
+        {currentBlogs.length >= 1 && blogs.length >= 1 ? (
           currentBlogs.map((value) => {
             return (
               <div
@@ -87,7 +86,7 @@ const Blogs = () => {
               <p
                 key={value}
                 onClick={() => dispatch(moveToPage(value))}
-                className="border p-2 rounded-lg m-2 cursor-pointer hover:bg-blue-300"
+                className="border p-2 px-3 rounded-full m-2 cursor-pointer hover:bg-blue-300 select-none"
               >
                 {String(value).padStart(2, "0")}
               </p>
