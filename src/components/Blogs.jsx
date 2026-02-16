@@ -1,65 +1,103 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
-import {removeBlog, moveToPage, fetchBlogs} from "../fetures/BlogSlice"
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBlogs, moveToPage, removeBlog } from "../fetures/BlogSlice";
 
-const Blogs = ()=>{
-  const {blogs, countBlogs, blogUpdated, currentPage, loading, error  } = useSelector((state)=>state.blogs)
-  const dispatch = useDispatch()
+const Blogs = () => {
+  const { blogs, currentPage, loading, error, limit } = useSelector(
+    (state) => state.blogs,
+  );
+  const dispatch = useDispatch();
 
-  const [currentBlogs, setCurrentBlogs] = useState([])
-  const [pageNumbers, setPageNumbers]  = useState([])
-  const limit  = 6
+  const [currentBlogs, setCurrentBlogs] = useState([]);
+  const [pageNumbers, setPageNumbers] = useState([]);
 
-  useEffect(()=>{
-    const blogsTemp = dispatch(fetchBlogs())
-   
-  },[])
+  useEffect(() => {
+    dispatch(fetchBlogs());
+  }, []);
 
-  useEffect(()=>{
-    if(!loading){
-    const skip = (currentPage-1)*limit
-    const temp = blogs.slice(skip, skip+limit)
-    setCurrentBlogs(temp)}
-  }, [currentPage, loading, blogUpdated])
+  useEffect(() => {
+    if (!loading) {
+      const skip = (currentPage - 1) * limit;
+      const temp = blogs.slice(skip, skip + limit);
+      setCurrentBlogs(temp);
+    }
+  }, [currentPage, loading, blogs, limit]);
 
-  useEffect(()=>{
-   let count = 1
-    let pages = []
-    const pageLimit = countBlogs/6
-   for(count; count<= pageLimit ; count++){
-    pages.push(count)
-   }
-   setPageNumbers(pages)
-  },[countBlogs])
+  useEffect(() => {
+    let count = 1;
+    let pages = [];
+    const pageLimit = Math.ceil(blogs.length / limit);
+    for (count; count <= pageLimit; count++) {
+      pages.push(count);
+    }
+    setPageNumbers(pages);
+  }, [blogs]);
 
+  return (
+    <>
+      <p className="text-2xl m-5 ml-[5%]">Blogs</p>
+      <div className="grid grid-cols-3 gap-3 m-[5%] mt-5">
+        {currentBlogs.length >= 1 && blogs.length >= 1 ? (
+          currentBlogs.map((value) => {
+            return (
+              <div
+                key={value.id}
+                className="w-full h-100 border p-3 m-3 overflow-y-auto rounded-2xl bg-blue-50"
+              >
+                <button
+                  onClick={() => dispatch(removeBlog(value.id))}
+                  className="bg-red-500 p-2 m-2 ml-0 border rounded text-white hover:bg-red-600 hover:text-white border-white"
+                >
+                  delete
+                </button>
+                <p>
+                  <span className="font-semibold">Blog id:</span> {value.id}
+                </p>
+                <p>
+                  <span className="font-semibold">user id:</span> {value.userId}
+                </p>
+                <p>
+                  <span className="font-semibold">Title :</span> {value.title}
+                </p>
+                <p>
+                  <span className="font-semibold">Description:</span>{" "}
+                  {value.body}
+                </p>
+              </div>
+            );
+          })
+        ) : (
+          <p>No blogs to show</p>
+        )}
+      </div>
 
-    return (
-        <>
-        <p className='text-2xl m-5 ml-[5%]'>Blogs</p>
-            <div className='grid grid-cols-3 gap-3 m-[5%] mt-5'>
-                {currentBlogs?currentBlogs.map((value)=>{
-                    return (<div key={value.id} className='w-full h-[400px] border p-3 m-3 overflow-y-auto rounded-2xl'>
-                        <button onClick={()=>dispatch(removeBlog(value.id))} className='text-red-500 p-2 m-2 border rounded bg-gray-300 hover:bg-gray-500'>delete</button>
-                        <p>Blog id: {value.id}</p>
-                        <p>title : {value.title}</p>
-                        <p>Description: {value.body}</p>
-                    </div>)
-                }):<p>No blogs to show</p>}
-            </div>
+      <div>
+        {loading && (
+          <p className="text-2xl font-bold text-center">loading ... </p>
+        )}
+        {error && <p className="font-semibold text-center">{error}</p>}
+      </div>
 
-            <div>
-                {loading&& <p>loading ... </p>}
-                {error && <p>{error}</p>}
-            </div>
+      <div className="flex flex-row gap-2 items-center justify-center m-5 ">
+        {pageNumbers ? (
+          pageNumbers.map((value) => {
+            return (
+              <p
+                key={value}
+                onClick={() => dispatch(moveToPage(value))}
+                className="border p-2 px-3 rounded-full m-2 cursor-pointer hover:bg-blue-300 select-none"
+              >
+                {String(value).padStart(2, "0")}
+              </p>
+            );
+          })
+        ) : (
+          <p>no pages</p>
+        )}
+      </div>
+    </>
+  );
+};
 
-            <div className='flex flex-row gap-2 items-center justify-center m-5 '>
-                {pageNumbers?pageNumbers.map((value)=>{
-                    return <p key={value} onClick={()=>dispatch(moveToPage(value))} className='border p-2 rounded-full m-2 cursor-pointer'>{value}</p>
-                }):<p>no pages</p>}
-            </div>
-        </>
-    )
-}
-
-export default Blogs
+export default Blogs;
